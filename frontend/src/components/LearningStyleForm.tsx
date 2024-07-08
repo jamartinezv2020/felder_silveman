@@ -35,3 +35,4 @@ const LearningStyleForm: React.FC<{ onResult: (learningStyle: string[]) => void 
 };
 
 export default LearningStyleForm;
+

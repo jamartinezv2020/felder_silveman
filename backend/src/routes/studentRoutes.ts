@@ -18,3 +18,4 @@ router.delete('/students/:id', deleteStudent);
 router.post('/students/classify', classifyLearningStyle);
 
 export default router;
+

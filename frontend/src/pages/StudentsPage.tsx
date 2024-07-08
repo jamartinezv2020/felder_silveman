@@ -1,49 +1,29 @@
-// src/pages/StudentsPage.tsx
-
-import React, { useState, useEffect } from 'react';
-import StudentForm from '../components/StudentForm';
+import React, { useEffect, useState } from 'react';
 import StudentList from '../components/StudentList';
-import { fetchStudents, addStudent, deleteStudent } from '../services/api';
+import StudentForm from '../components/StudentForm';
+import { Student } from '../models/Student';
+import { getStudents, createStudent, deleteStudent } from '../services/studentService';
 
 const StudentsPage: React.FC = () => {
-  const [students, setStudents] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [students, setStudents] = useState<Student[]>([]);
 
   useEffect(() => {
-    fetchStudents()
-      .then((data) => {
-        setStudents(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setError(error.message);
-        setLoading(false);
-      });
+    const fetchData = async () => {
+      const studentsData = await getStudents();
+      setStudents(studentsData);
+    };
+    fetchData();
   }, []);
 
-  const handleAddStudent = (formData: any) => {
-    addStudent(formData)
-      .then((newStudent) => {
-        setStudents([...students, newStudent]);
-      })
-      .catch((error) => {
-        setError(error.message);
-      });
+  const handleAddStudent = async (student: { name: string; email: string; learningStyle: string[] }) => {
+    const newStudent = await createStudent(student);
+    setStudents([...students, newStudent]);
   };
 
-  const handleDeleteStudent = (studentId: string) => {
-    deleteStudent(studentId)
-      .then(() => {
-        setStudents(students.filter((student) => student._id !== studentId));
-      })
-      .catch((error) => {
-        setError(error.message);
-      });
+  const handleDeleteStudent = async (studentId: string) => {
+    await deleteStudent(studentId);
+    setStudents(students.filter(student => student._id !== studentId));
   };
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error fetching students: {error}</p>;
 
   return (
     <div>
@@ -55,6 +35,8 @@ const StudentsPage: React.FC = () => {
 };
 
 export default StudentsPage;
+
+
 
 
 

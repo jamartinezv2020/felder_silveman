@@ -1,62 +1,49 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
+import { Student } from '../models/Student';
 
 interface StudentFormProps {
-  student: any | null;
-  fetchStudents: () => void;
+  onSubmit: (student: { name: string; email: string; learningStyle: string[] }) => void;
 }
 
-const StudentForm: React.FC<StudentFormProps> = ({ student, fetchStudents }) => {
+const StudentForm: React.FC<StudentFormProps> = ({ onSubmit }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [learningStyle, setLearningStyle] = useState<string[]>([]);
 
-  useEffect(() => {
-    if (student) {
-      setName(student.name);
-      setEmail(student.email);
-    } else {
-      setName('');
-      setEmail('');
-    }
-  }, [student]);
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    try {
-      if (student) {
-        await axios.put(`${process.env.REACT_APP_API_URL}/students/${student._id}`, { name, email });
-      } else {
-        await axios.post(`${process.env.REACT_APP_API_URL}/students`, { name, email });
-      }
-      fetchStudents();
-    } catch (error) {
-      console.error('Error saving student', error);
-    }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({ name, email, learningStyle });
+    setName('');
+    setEmail('');
+    setLearningStyle([]);
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>{student ? 'Edit Student' : 'Add Student'}</h2>
-      <div>
-        <label>Name:</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </div>
-      <div>
-        <label>Email:</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
-      <button type="submit">{student ? 'Update' : 'Add'}</button>
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Name"
+      />
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+      />
+      <input
+        type="text"
+        value={learningStyle.join(', ')}
+        onChange={(e) => setLearningStyle(e.target.value.split(', '))}
+        placeholder="Learning Styles (comma separated)"
+      />
+      <button type="submit">Add Student</button>
     </form>
   );
 };
 
 export default StudentForm;
+
+
 

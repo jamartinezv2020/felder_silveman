@@ -1,6 +1,6 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
-interface IStudent extends Document {
+export interface IStudent extends Document {
   name: string;
   email: string;
   learningStyle: string[];
@@ -15,3 +15,5 @@ const studentSchema: Schema = new Schema({
 const Student = mongoose.model<IStudent>('Student', studentSchema);
 
 export default Student;
+
+
