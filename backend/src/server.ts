@@ -5,7 +5,11 @@ import session from 'express-session';
 import connectDB from './db'; // Asegúrate de que la ruta a ./db esté correctamente definida
 import authRoutes from './routes/auth';
 import studentRoutes from './routes/students';
+import dotenv from 'dotenv';
 import passport from './config/passport'; // Importar la configuración de Passport
+
+// Cargar las variables de entorno
+dotenv.config();
 
 const app = express();
 

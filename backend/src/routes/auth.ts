@@ -9,7 +9,7 @@ const router = Router();
 /**
  * Ruta para autenticación de usuario.
  * 
- * @route POST /login
+ * @route POST /auth/login
  * @param {string} email - Correo electrónico del usuario.
  * @param {string} password - Contraseña del usuario.
  * @returns {json} - Token JWT si el inicio de sesión es exitoso.
@@ -64,7 +64,7 @@ router.post(
 /**
  * Ruta para registrar un nuevo usuario.
  * 
- * @route POST /register
+ * @route POST /auth/register
  * @param {string} email - Correo electrónico del usuario.
  * @param {string} password - Contraseña del usuario.
  * @returns {json} - Token JWT si el registro es exitoso.
@@ -73,7 +73,7 @@ router.post(
   '/register',
   [
     check('email', 'Please include a valid email').isEmail(),
-    check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
+    check('password', 'Please enter a password with 5 or more characters').isLength({ min: 5 }),
   ],
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
