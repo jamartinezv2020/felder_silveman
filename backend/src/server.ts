@@ -1,9 +1,11 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
+import session from 'express-session';
 import connectDB from './db'; // Asegúrate de que la ruta a ./db esté correctamente definida
 import authRoutes from './routes/auth';
 import studentRoutes from './routes/students';
+import passport from './config/passport'; // Importar la configuración de Passport
 
 const app = express();
 
@@ -25,15 +27,25 @@ connectDB()
 // Middleware para analizar el cuerpo de las solicitudes como JSON
 app.use(express.json());
 
+// Middleware de sesión
+app.use(session({
+  secret: process.env.SESSION_SECRET!,
+  resave: false,
+  saveUninitialized: false,
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Definir rutas para la autenticación y los estudiantes
+app.use('/api/auth', authRoutes);
+app.use('/api/students', studentRoutes);
+
 // Middleware de manejo de errores global
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error('Error:', err.stack);
   res.status(500).send('Something broke!');
 });
-
-// Definir rutas para la autenticación y los estudiantes
-app.use('/api/auth', authRoutes);
-app.use('/api/students', studentRoutes);
 
 // Puerto para el servidor, usando el puerto definido en la variable de entorno PORT, o 5000 por defecto
 const PORT = process.env.PORT ?? 5000;
@@ -42,3 +54,5 @@ const PORT = process.env.PORT ?? 5000;
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
+
+export default app;

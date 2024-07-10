@@ -1,66 +1,91 @@
 import { Request, Response } from 'express';
-import * as studentService from '../services/studentService';
+import Student from '../models/Student';
 
-export const getStudents = async (req: Request, res: Response) => {
+// @desc    Get all students
+// @route   GET /api/students
+// @access  Public
+export const getStudents = async (req: Request, res: Response): Promise<void> => {
   try {
-    const students = await studentService.getAllStudents();
+    const students = await Student.find();
     res.status(200).json(students);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (error: any) {
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
-export const getStudentById = async (req: Request, res: Response) => {
+// @desc    Get student by ID
+// @route   GET /api/students/:id
+// @access  Public
+export const getStudentById = async (req: Request, res: Response): Promise<void> => {
   try {
-    const student = await studentService.getStudentById(req.params.id);
+    const student = await Student.findById(req.params.id);
     if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
+      res.status(404).json({ message: 'Student not found' });
+    } else {
+      res.status(200).json(student);
     }
-    res.status(200).json(student);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (error: any) {
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
-export const createStudent = async (req: Request, res: Response) => {
+// @desc    Create a new student
+// @route   POST /api/students
+// @access  Public
+export const createStudent = async (req: Request, res: Response): Promise<void> => {
   try {
-    const newStudent = await studentService.createStudent(req.body);
-    res.status(201).json(newStudent);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    const { name, email, learningStyle } = req.body;
+
+    const newStudent = new Student({
+      name,
+      email,
+      learningStyle,
+    });
+
+    const student = await newStudent.save();
+    res.status(201).json(student);
+  } catch (error: any) {
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
-export const updateStudent = async (req: Request, res: Response) => {
+// @desc    Update student by ID
+// @route   PUT /api/students/:id
+// @access  Public
+export const updateStudent = async (req: Request, res: Response): Promise<void> => {
   try {
-    const updatedStudent = await studentService.updateStudent(req.params.id, req.body);
-    if (!updatedStudent) {
-      return res.status(404).json({ message: 'Student not found' });
+    const { name, email, learningStyle } = req.body;
+
+    const student = await Student.findByIdAndUpdate(
+      req.params.id,
+      { name, email, learningStyle },
+      { new: true, runValidators: true }
+    );
+
+    if (!student) {
+      res.status(404).json({ message: 'Student not found' });
+    } else {
+      res.status(200).json(student);
     }
-    res.status(200).json(updatedStudent);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (error: any) {
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
-export const deleteStudent = async (req: Request, res: Response) => {
+// @desc    Delete student by ID
+// @route   DELETE /api/students/:id
+// @access  Public
+export const deleteStudent = async (req: Request, res: Response): Promise<void> => {
   try {
-    const deletedStudent = await studentService.deleteStudent(req.params.id);
-    if (!deletedStudent) {
-      return res.status(404).json({ message: 'Student not found' });
+    const student = await Student.findByIdAndDelete(req.params.id);
+
+    if (!student) {
+      res.status(404).json({ message: 'Student not found' });
+    } else {
+      res.status(200).json({ message: 'Student removed' });
     }
-    res.status(200).json({ message: 'Student deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const classifyLearningStyle = (req: Request, res: Response) => {
-  try {
-    const learningStyle = studentService.classifyLearningStyle(req.body.responses);
-    res.status(200).json({ learningStyle });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (error: any) {
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 

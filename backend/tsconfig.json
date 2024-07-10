@@ -2,6 +2,10 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ],
     "esModuleInterop": true,
     "types": ["node"], // Asegúrate de incluir "node" aquí
     "strict": true,

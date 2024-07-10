@@ -1,27 +1,24 @@
-// src/components/LoginForm.tsx
+// src/components/AuthForm.tsx
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login, register, recoverPassword } from '../services/authService';
 import { TextField, Button, Container, Typography, Box, Link } from '@mui/material';
+import { Google as GoogleIcon } from '@mui/icons-material';
 
 /**
  * Componente de formulario de autenticación.
- * Permite a los usuarios iniciar sesión, registrarse y recuperar la contraseña.
+ * Permite a los usuarios iniciar sesión, registrarse y recuperar la contraseña,
+ * además de iniciar sesión con Google.
  * 
  * @returns {JSX.Element} - El componente AuthForm.
  */
-const AuthForm: React.FC = () => {
+const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mode, setMode] = useState<'login' | 'register' | 'recover'>('login');
   const navigate = useNavigate();
 
-  /**
-   * Maneja el envío del formulario basado en el modo actual (login, register, recover).
-   * 
-   * @param {React.FormEvent} e - Evento de envío del formulario.
-   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     let success = false;
@@ -52,6 +49,10 @@ const AuthForm: React.FC = () => {
     }
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = '/auth/google';
+  };
+
   return (
     <Container maxWidth="sm">
       <Box
@@ -67,7 +68,7 @@ const AuthForm: React.FC = () => {
           {mode === 'register' && 'Register'}
           {mode === 'recover' && 'Recover Password'}
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
           <TextField
             margin="normal"
             required
@@ -104,6 +105,15 @@ const AuthForm: React.FC = () => {
             {mode === 'register' && 'Register'}
             {mode === 'recover' && 'Send Recovery Email'}
           </Button>
+          <Button
+            fullWidth
+            variant="contained"
+            sx={{ mb: 2 }}
+            onClick={handleGoogleLogin}
+            startIcon={<GoogleIcon />}
+          >
+            Login with Google
+          </Button>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             {mode === 'login' ? (
               <>
@@ -126,7 +136,8 @@ const AuthForm: React.FC = () => {
   );
 };
 
-export default AuthForm;
+export default LoginForm;
+
 
 
 
