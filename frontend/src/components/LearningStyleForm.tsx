@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
+import { Button, Typography, TextField, Grid } from '@mui/material';
 import { classifyLearningStyle } from '../services/api';
 
-const LearningStyleForm: React.FC<{ onResult: (learningStyle: string[]) => void }> = ({ onResult }) => {
+interface LearningStyleFormProps {
+  onResult: (learningStyle: string[]) => void;
+}
+
+const LearningStyleForm: React.FC<LearningStyleFormProps> = ({ onResult }) => {
   const [responses, setResponses] = useState<number[]>(new Array(44).fill(0));
 
   const handleChange = (index: number, value: number) => {
@@ -18,18 +23,26 @@ const LearningStyleForm: React.FC<{ onResult: (learningStyle: string[]) => void 
 
   return (
     <form onSubmit={handleSubmit}>
-      {responses.map((response, index) => (
-        <div key={index}>
-          <label>Question {index + 1}</label>
-          <input
-            type="number"
-            value={response}
-            onChange={(e) => handleChange(index, Number(e.target.value))}
-            required
-          />
-        </div>
-      ))}
-      <button type="submit">Classify</button>
+      <Typography variant="h5" gutterBottom>
+        Classify Learning Style
+      </Typography>
+      <Grid container spacing={2}>
+        {responses.map((response, index) => (
+          <Grid item xs={12} sm={6} key={index}>
+            <TextField
+              label={`Question ${index + 1}`}
+              type="number"
+              value={response}
+              onChange={(e) => handleChange(index, Number(e.target.value))}
+              fullWidth
+              required
+            />
+          </Grid>
+        ))}
+      </Grid>
+      <Button variant="contained" color="primary" type="submit">
+        Classify
+      </Button>
     </form>
   );
 };

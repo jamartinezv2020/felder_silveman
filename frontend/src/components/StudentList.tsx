@@ -1,6 +1,6 @@
-// En tu componente StudentList.tsx u otro componente que muestre la lista de estudiantes
 import React from 'react';
 import { Student } from '../models/Student'; // Asegúrate de importar la interfaz Student desde la ubicación correcta
+import { Box, Typography, Button, Divider } from '@mui/material';
 
 interface StudentListProps {
   students: Student[];
@@ -9,19 +9,28 @@ interface StudentListProps {
 
 const StudentList: React.FC<StudentListProps> = ({ students, onDelete }) => {
   return (
-    <div>
-      <h1>Student List</h1>
+    <Box mt={4}>
+      <Typography variant="h4" gutterBottom>
+        Lista de Estudiantes
+      </Typography>
       {students.map((student) => (
-        <div key={student._id}>
-          <h2>{student.name}</h2>
-          <p>Email: {student.email}</p>
-          <p>Learning Style: {student.learningStyle.join(', ')}</p> {/* Usando join porque learningStyle es un array de strings */}
-          <button onClick={() => onDelete(student._id)}>Delete</button>
-          <hr />
-        </div>
+        <Box key={student._id} mb={2} p={2} bgcolor="background.paper" boxShadow={2}>
+          <Typography variant="h5">{student.name}</Typography>
+          <Typography variant="body1" color="text.secondary">
+            Email: {student.email}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            Estilo de Aprendizaje: {student.learningStyle.join(', ')}
+          </Typography>
+          <Button variant="contained" color="error" onClick={() => onDelete(student._id)}>
+            Eliminar
+          </Button>
+          <Divider sx={{ mt: 2 }} />
+        </Box>
       ))}
-    </div>
+    </Box>
   );
 };
 
 export default StudentList;
+

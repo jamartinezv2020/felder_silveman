@@ -1,62 +1,30 @@
-import express, { Request, Response, NextFunction } from 'express';
-import cors from 'cors';
+import express from 'express';
 import mongoose from 'mongoose';
-import session from 'express-session';
-import connectDB from './db'; // Asegúrate de que la ruta a ./db esté correctamente definida
-import authRoutes from './routes/auth';
-import studentRoutes from './routes/students';
-import dotenv from 'dotenv';
-import passport from './config/passport'; // Importar la configuración de Passport
-
-// Cargar las variables de entorno
-dotenv.config();
+import bodyParser from 'body-parser';
+import userRouter from './routes/userRoutes';
+import cors from 'cors'; // Importa cors
 
 const app = express();
 
-// Middleware de CORS para permitir solicitudes desde localhost:3000
-app.use(cors({
-  origin: 'http://localhost:3000',
-}));
+// Middleware
+app.use(bodyParser.json());
+app.use(cors()); // Usa CORS middleware
 
-// Conectar a la base de datos MongoDB
-connectDB()
-  .then(() => {
-    console.log('MongoDB connected');
-  })
-  .catch((err) => {
-    console.error('Error connecting to MongoDB:', err.message);
-    process.exit(1); // Salir del proceso con error en caso de falla
-  });
+// Rutas
+app.use('/api/users', userRouter);
 
-// Middleware para analizar el cuerpo de las solicitudes como JSON
-app.use(express.json());
+// Conectar a MongoDB
+mongoose.connect('mongodb://localhost:27017/bd_feldersilverman', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+})
+  .then(() => console.log('Conectado a MongoDB'))
+  .catch(err => console.error('Error de conexión a MongoDB', err));
 
-// Middleware de sesión
-app.use(session({
-  secret: process.env.SESSION_SECRET!,
-  resave: false,
-  saveUninitialized: false,
-}));
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Servidor iniciado en puerto ${PORT}`));
 
-app.use(passport.initialize());
-app.use(passport.session());
 
-// Definir rutas para la autenticación y los estudiantes
-app.use('/api/auth', authRoutes);
-app.use('/api/students', studentRoutes);
 
-// Middleware de manejo de errores global
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error('Error:', err.stack);
-  res.status(500).send('Something broke!');
-});
-
-// Puerto para el servidor, usando el puerto definido en la variable de entorno PORT, o 5000 por defecto
-const PORT = process.env.PORT ?? 5000;
-
-// Iniciar el servidor
-app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
-});
-
-export default app;

@@ -1,100 +1,106 @@
-// src/components/RegisterForm.tsx
+import React, { useState, ChangeEvent, FormEvent } from 'react';
+import axios from 'axios';
+import { TextField, Button, Typography, Box, Snackbar } from '@mui/material';
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { register } from '../services/authService';
-import { TextField, Button, Container, Typography, Box } from '@mui/material';
+interface FormData {
+  username: string;
+  email: string;
+  password: string;
+}
 
-/**
- * Componente de formulario de registro.
- * Permite a los usuarios crear una nueva cuenta.
- * 
- * @returns {JSX.Element} - El componente RegisterForm.
- */
 const RegisterForm: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const navigate = useNavigate();
+  const [formData, setFormData] = useState<FormData>({
+    username: '',
+    email: '',
+    password: '',
+  });
 
-  /**
-   * Maneja el envío del formulario de registro.
-   * 
-   * @param {React.FormEvent} e - Evento de envío del formulario.
-   */
-  const handleSubmit = async (e: React.FormEvent) => {
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+
+  const { username, email, password } = formData;
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const success = await register(email, password, { username });
-    if (success) {
-      navigate('/login');
-    } else {
-      alert('Registration failed');
+    try {
+      const res = await axios.post('http://localhost:5000/api/users/register', {
+        username,
+        email,
+        password,
+      });
+      console.log(res.data); // Mensaje de confirmación del servidor
+      setSnackbarMessage('Usuario registrado correctamente');
+      setSnackbarOpen(true);
+      setFormData({ username: '', email: '', password: '' }); // Limpiar el formulario después del registro exitoso
+    } catch (err: any) {
+      console.error(err.response?.data);
+      setSnackbarMessage('Error al registrar usuario');
+      setSnackbarOpen(true);
     }
   };
 
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
+
   return (
-    <Container maxWidth="sm">
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          mt: 8,
-        }}
-      >
-        <Typography component="h1" variant="h5">
-          Register
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="username"
-            label="Username"
-            name="username"
-            autoComplete="username"
-            autoFocus
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Register
-          </Button>
-        </Box>
-      </Box>
-    </Container>
+    <Box sx={{ maxWidth: 400, mx: 'auto' }}>
+      <Typography variant="h5" gutterBottom>
+        Registro de Usuario
+      </Typography>
+      <form onSubmit={handleSubmit}>
+        <TextField
+          fullWidth
+          type="text"
+          name="username"
+          value={username}
+          onChange={handleChange}
+          label="Nombre de usuario"
+          variant="outlined"
+          margin="normal"
+          required
+        />
+        <TextField
+          fullWidth
+          type="email"
+          name="email"
+          value={email}
+          onChange={handleChange}
+          label="Correo electrónico"
+          variant="outlined"
+          margin="normal"
+          required
+        />
+        <TextField
+          fullWidth
+          type="password"
+          name="password"
+          value={password}
+          onChange={handleChange}
+          label="Contraseña"
+          variant="outlined"
+          margin="normal"
+          required
+        />
+        <Button type="submit" variant="contained" color="primary">
+          Registrar
+        </Button>
+      </form>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+      />
+    </Box>
   );
 };
 
 export default RegisterForm;
+
 
 
