@@ -7,7 +7,7 @@ import AnalyticsPage from '../../pages/Analytics/Analytics';
 import SettingsPage from '../../pages/Settings/Settings';
 
 interface DashboardProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ children }) => {

@@ -1,3 +1,5 @@
+// Ubicación: src/components/LoginForm.tsx
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Container, Typography, Box, Link } from '@mui/material';
@@ -17,17 +19,28 @@ const LoginForm: React.FC = () => {
 
     if (mode === 'login') {
       try {
-        await login(); // Aquí deberías llamar a tu servicio de autenticación
-        navigate('/dashboard');
-      } catch (error) {
-        alert('Login failed');
+        const res = await fetch('http://localhost:5000/api/users/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          login(data.token);
+          navigate('/dashboard');
+        } else {
+          alert('Login failed: ' + data.message);
+        }
+      } catch (error: any) {
+        alert('Login failed: ' + error.message);
       }
     } else if (mode === 'register') {
-      // Lógica para manejar el registro, si es necesario
       alert('Registration successful. Please log in.');
       setMode('login');
     } else if (mode === 'recover') {
-      // Lógica para manejar la recuperación de contraseña, si es necesario
       alert('Password recovery email sent');
       setMode('login');
     }
@@ -119,3 +132,6 @@ const LoginForm: React.FC = () => {
 };
 
 export default LoginForm;
+
+
+

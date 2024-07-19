@@ -1,41 +1,45 @@
-// src/AuthContext.tsx
-import React, { createContext, useContext, useState, ReactNode, FC } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import axios from 'axios';
 
-interface AuthContextType {
-  isAuthenticated: boolean;
-  login: () => void;
+interface AuthContextProps {
+  token: string | null;
+  login: (token: string) => void;
   logout: () => void;
+  isAuthenticated: () => boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
-export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [token, setToken] = useState<string | null>(null);
 
-  const login = () => {
-    setIsAuthenticated(true);
+  const login = (token: string) => {
+    setToken(token);
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   };
 
   const logout = () => {
-    setIsAuthenticated(false);
+    setToken(null);
+    delete axios.defaults.headers.common['Authorization'];
+  };
+
+  const isAuthenticated = () => {
+    return token !== null;
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ token, login, logout, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
 
