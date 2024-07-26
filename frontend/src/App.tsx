@@ -10,6 +10,7 @@ import AboutPage from './pages/AboutPage/AboutPage';
 import JoinUsPage from './pages/JoinUsPage/JoinUsPage'; // Asegúrate de crear este componente
 import SearchResultsPage from './pages/SearchResultsPage/SearchResultsPage'; // Asegúrate de crear este componente
 import UserManagementPage from './pages/UserManagementPage/UserManagementPage'; // Importa la página de gestión de usuarios
+import LearningStyleFelderSilvermanForm from './components/LearningStyleFelderSilvermanForm';
 
 
 
@@ -19,7 +20,8 @@ const App: React.FC = () => {
     
       <AuthProvider>
         <Router>
-        <Routes>
+        <div className="App">
+          <Routes>
           <Route path="/login" element={<LoginForm />} />
           <Route path="/dashboard" element={<PrivateRoute component={Dashboard} path="/dashboard" />} />
           <Route path="/about" element={<AboutPage />} />
@@ -27,8 +29,9 @@ const App: React.FC = () => {
           <Route path="/search" element={<SearchResultsPage />} />
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/admin/users" element={<UserManagementPage />} />
+          <Route path="/admin/stylefeldersilverman" element={<LearningStyleFelderSilvermanForm />} />
         </Routes>
-      
+        </div>
     </Router>
     </AuthProvider>
   );
