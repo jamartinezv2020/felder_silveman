@@ -3,6 +3,19 @@
 import axios from '../api/axios';
 import { Student } from '../models/Student';
 
+
+// Función para actualizar el estilo de aprendizaje de un estudiante
+export const updateLearningStyle = async (responses: number[]): Promise<void> => {
+  try {
+    const studentId = "ID_DEL_ESTUDIANTE"; // Reemplaza con el ID correcto o con una variable que lo contenga
+    const response = await axios.put('http://localhost:5000/api/students/updateLearningStyle', { responses, studentId });
+    console.log(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
 export const createStudent = async (student: { name: string; email: string; learningStyle: string[] }) => {
   const response = await axios.post('/api/students', student);
   return response.data as Student;

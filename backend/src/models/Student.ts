@@ -1,24 +1,48 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import { Schema, Document, model } from 'mongoose';
+import { isFuture, differenceInYears } from 'date-fns';
 
 // Definición de la interfaz para el estudiante
-export interface Student {
+export interface IStudent extends Document {
   name: string;
+  email: string;
+  birthdate: Date;
   age: number;
+  learningStyle?: string[];
+  responses?: number[];
+  createdAt: Date;
 }
 
-// Definición del tipo de documento del estudiante
-export type StudentDocument = Document & Student;
-
 // Esquema del estudiante
-const studentSchema = new Schema<Student>({
+const studentSchema = new Schema({
   name: { type: String, required: true },
-  age: { type: Number, required: true },
+  email: { type: String, required: true, unique: true },
+  birthdate: {
+    type: Date,
+    required: true,
+    validate: {
+      validator: (value: Date) => !isFuture(value),
+      message: 'Birthdate cannot be in the future.',
+    },
+  },
+  age: {
+    type: Number,
+    required: true,
+    min: [5, 'Age must be at least 5'],
+  },
+  learningStyle: { type: [String], default: [] },
+  responses: { type: [Number], default: [] },
+  createdAt: { type: Date, default: Date.now },
 });
 
-// Modelo de Mongoose para el estudiante
-const Student = mongoose.model<StudentDocument>('Student', studentSchema);
+// Middleware para calcular la edad antes de guardar
+studentSchema.pre<IStudent>('save', function (next) {
+  this.age = differenceInYears(new Date(), this.birthdate);
+  if (this.age < 5) {
+    throw new Error('Age must be at least 5');
+  }
+  next();
+});
 
-export default Student;
-
+export default model<IStudent>('Student', studentSchema);
 
 

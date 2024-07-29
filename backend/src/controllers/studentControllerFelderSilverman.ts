@@ -117,7 +117,7 @@ export const updateUser = async (req: Request, res: Response) => {
     res.status(200).json(updatedUser);
   } catch (error) {
     console.error('Error actualizando usuario:', error);
-    res.status{500}.json({ message: 'Error del servidor' });
+    res.status(500).json({ message: 'Error del servidor' });
   }
 };
 
@@ -151,4 +151,3 @@ export const getUserProfile = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error del servidor' });
   }
 };
-

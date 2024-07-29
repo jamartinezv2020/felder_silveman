@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
+import Student from '../models/Student';
+import { classifyLearningStyle } from '../utils/learningStyleClassifier';
 
 // Controlador para registrar un nuevo usuario
 export const registerUser = async (req: Request, res: Response) => {
@@ -10,7 +12,7 @@ export const registerUser = async (req: Request, res: Response) => {
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: 'El usuario ya existe' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -23,10 +25,10 @@ export const registerUser = async (req: Request, res: Response) => {
 
     await newUser.save();
 
-    res.status(201).json({ message: 'User registered successfully' });
+    res.status(201).json({ message: 'Usuario registrado exitosamente' });
   } catch (error) {
-    console.error('Error registering user:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error registrando usuario:', error);
+    res.status(500).json({ message: 'Error del servidor' });
   }
 };
 
@@ -37,20 +39,47 @@ export const loginUser = async (req: Request, res: Response) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Credenciales inválidas' });
     }
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET as string, { expiresIn: '1h' });
 
-    res.status(200).json({ message: 'Login successful', token });
+    res.status(200).json({ message: 'Inicio de sesión exitoso', token });
   } catch (error) {
-    console.error('Error logging in user:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error iniciando sesión de usuario:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+};
+
+// Controlador para actualizar el estilo de aprendizaje de un estudiante
+export const updateStudentLearningStyle = async (req: Request, res: Response) => {
+  try {
+    const { responses, studentId } = req.body;
+    if (!studentId) {
+      return res.status(400).json({ message: 'Falta el ID del estudiante' });
+    }
+
+    const learningStyle = classifyLearningStyle(responses);
+
+    const student = await Student.findByIdAndUpdate(
+      studentId,
+      { learningStyle },
+      { new: true, runValidators: true }
+    );
+
+    if (!student) {
+      res.status(404).json({ message: 'Estudiante no encontrado' });
+    } else {
+      res.status(200).json(student);
+    }
+  } catch (error: any) {
+    console.error('Error actualizando estilo de aprendizaje:', error);
+    res.status(500).json({ message: 'Error del servidor', error: error.message });
   }
 };
 
@@ -60,8 +89,8 @@ export const getAllUsers = async (req: Request, res: Response) => {
     const users = await User.find();
     res.status(200).json(users);
   } catch (error) {
-    console.error('Error getting users:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error obteniendo usuarios:', error);
+    res.status(500).json({ message: 'Error del servidor' });
   }
 };
 
@@ -71,12 +100,12 @@ export const getUserById = async (req: Request, res: Response) => {
   try {
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'Usuario no encontrado' });
     }
     res.status(200).json(user);
   } catch (error) {
-    console.error('Error getting user by ID:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error obteniendo usuario por ID:', error);
+    res.status(500).json({ message: 'Error del servidor' });
   }
 };
 
@@ -87,12 +116,12 @@ export const updateUser = async (req: Request, res: Response) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(userId, { username, email }, { new: true });
     if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'Usuario no encontrado' });
     }
     res.status(200).json(updatedUser);
   } catch (error) {
-    console.error('Error updating user:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error actualizando usuario:', error);
+    res.status(500).json({ message: 'Error del servidor' });
   }
 };
 
@@ -102,12 +131,12 @@ export const deleteUser = async (req: Request, res: Response) => {
   try {
     const deletedUser = await User.findByIdAndDelete(userId);
     if (!deletedUser) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'Usuario no encontrado' });
     }
-    res.status(200).json({ message: 'User deleted successfully' });
+    res.status(200).json({ message: 'Usuario eliminado exitosamente' });
   } catch (error) {
-    console.error('Error deleting user:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error eliminando usuario:', error);
+    res.status(500).json({ message: 'Error del servidor' });
   }
 };
 
@@ -117,12 +146,13 @@ export const getUserProfile = async (req: Request, res: Response) => {
 
     const user = await User.findById(userId).select('-password');
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
     res.json(user);
   } catch (error) {
-    console.error('Error getting user profile:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error obteniendo perfil de usuario:', error);
+    res.status(500).json({ message: 'Error del servidor' });
   }
 };
+

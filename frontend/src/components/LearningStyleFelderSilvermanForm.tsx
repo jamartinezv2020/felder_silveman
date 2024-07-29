@@ -1,18 +1,37 @@
 // src/components/LearningStyleFelderSilvermanForm.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { classifyLearningStyleFelderSilverman } from '../utils/learningStyleClassifierFelderSilveraman';
-import { Box, Button, Container, Typography, Alert, Grid, LinearProgress, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Card, CardContent, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import {
+  Box, Button, Container, Typography, Alert, Grid, LinearProgress, FormControl, FormLabel,
+  RadioGroup, FormControlLabel, Radio, Card, CardContent, Accordion, AccordionSummary, AccordionDetails
+} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { questions } from '../components/Data/questions';
 
 const QUESTIONS_PER_PAGE = 5;
+
+interface StudentData {
+  name: string;
+  id: string;
+  email: string;
+  // Agrega otros campos según tus necesidades
+}
 
 const LearningStyleFelderSilvermanForm: React.FC = () => {
   const [responses, setResponses] = useState<number[]>(Array(questions.length).fill(0));
   const [learningStyle, setLearningStyle] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(0);
+  const [showResult, setShowResult] = useState<boolean>(false);
+  const [studentData, setStudentData] = useState<StudentData | null>(null);
+
+  useEffect(() => {
+    const studentInfo = localStorage.getItem('studentData');
+    if (studentInfo) {
+      setStudentData(JSON.parse(studentInfo));
+    }
+  }, []);
 
   const handleChange = (index: number, value: number) => {
     const newResponses = [...responses];
@@ -22,16 +41,30 @@ const LearningStyleFelderSilvermanForm: React.FC = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setError(null); // Clear previous errors
+
+    if (responses.includes(0)) {
+      setError('Por favor responde todas las preguntas antes de enviar.');
+      return;
+    }
 
     try {
-      const style = classifyLearningStyleFelderSilverman(responses);
-      setLearningStyle(style);
+      const calculatedLearningStyle = classifyLearningStyleFelderSilverman(responses);
+      setLearningStyle(calculatedLearningStyle);
+      setShowResult(true);
 
-      const { data } = await axios.post('/api/students/updateLearningStyle', { responses: style });
-      console.log('Learning style updated:', data);
-    } catch (error: any) {
-      setError(error.message);
+      if (!studentData || !studentData.id) {
+        setError('Faltan datos del estudiante');
+        return;
+      }
+
+      await axios.put('http://localhost:5000/api/students/updateLearningStyle', {
+        studentId: studentData.id,
+        responses,
+      });
+
+      setError(null);
+    } catch (error) {
+      setError('Error al enviar el formulario');
     }
   };
 
@@ -39,132 +72,152 @@ const LearningStyleFelderSilvermanForm: React.FC = () => {
     setCurrentPage(currentPage + 1);
   };
 
-  const handlePrevPage = () => {
+  const handlePreviousPage = () => {
     setCurrentPage(currentPage - 1);
   };
 
-  const totalPages = Math.ceil(responses.length / QUESTIONS_PER_PAGE);
-  const startQuestionIndex = currentPage * QUESTIONS_PER_PAGE;
-  const endQuestionIndex = startQuestionIndex + QUESTIONS_PER_PAGE;
-  const questionsToDisplay = questions.slice(startQuestionIndex, endQuestionIndex);
+  const renderQuestions = () => {
+    const start = currentPage * QUESTIONS_PER_PAGE;
+    const end = start + QUESTIONS_PER_PAGE;
+    return questions.slice(start, end).map((question, index) => (
+      <Card key={index} sx={{ marginBottom: 2 }}>
+        <CardContent sx={{ textAlign: 'left' }}>
+          <Typography variant="body1">{`${start + index + 1}. ${question.question}`}</Typography>
+          {question.helpText && (
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="body2">Ayuda</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography variant="body2" color="textSecondary" gutterBottom>
+                  {question.helpText}
+                </Typography>
+              </AccordionDetails>
+            </Accordion>
+          )}
+          <FormControl component="fieldset" sx={{ mt: 2 }}>
+            <FormLabel component="legend" sx={{ textAlign: 'left' }}>Selecciona una opción:</FormLabel>
+            <RadioGroup
+              aria-label={`question-${start + index}`}
+              name={`question-${start + index}`}
+              value={responses[start + index]}
+              onChange={(e) => handleChange(start + index, parseInt(e.target.value))}
+              sx={{ textAlign: 'left' }}
+            >
+              {question.options.map((option, idx) => (
+                <FormControlLabel
+                  key={idx}
+                  value={idx + 1}
+                  control={<Radio />}
+                  label={`${String.fromCharCode(65 + idx)}. ${option}`}
+                  sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', textAlign: 'left' }}
+                />
+              ))}
+            </RadioGroup>
+          </FormControl>
+        </CardContent>
+      </Card>
+    ));
+  };
 
-  const progress = (responses.filter(response => response !== 0).length / responses.length) * 100;
+  const totalPages = Math.ceil(questions.length / QUESTIONS_PER_PAGE);
+  const progress = (currentPage + 1) / totalPages * 100;
 
   return (
     <Container maxWidth="md">
-      <Box mt={4} mb={4}>
-        <Typography variant="h4" component="h2" gutterBottom>
-          Learning Style Inventory
-        </Typography>
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h6">Instrucciones para completar el formulario</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography align="left">
-              Este formulario está diseñado para identificar su estilo de aprendizaje según el modelo de Felder-Silverman.
-              <ul>
-                <li>Para cada pregunta, seleccione la opción que mejor describa su preferencia.</li>
-                <li>Las preguntas están distribuidas en varias páginas, puede avanzar y retroceder usando los botones correspondientes.</li>
-                <li>Su progreso se mostrará en una barra de progreso en la parte superior del formulario.</li>
-              </ul>
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-        <LinearProgress variant="determinate" value={progress} sx={{ mb: 2 }} />
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={2}>
-            {questionsToDisplay.map((question, index) => (
-              <Grid item xs={12} key={startQuestionIndex + index}>
-                <Card variant="outlined" sx={{ backgroundColor: '#f9f9f9', borderRadius: 2 }}>
-                  <CardContent>
-                    <FormControl component="fieldset" fullWidth>
-                      <FormLabel component="legend" sx={{ fontWeight: 'bold', color: '#333', mb: 2, textAlign: 'left' }}>
-                        {`${startQuestionIndex + index + 1}. ${question.question}`}
-                      </FormLabel>
-                      <RadioGroup
-                        row
-                        value={responses[startQuestionIndex + index]}
-                        onChange={(e) => handleChange(startQuestionIndex + index, parseInt(e.target.value))}
-                      >
-                        {question.options.map((option, optionIndex) => (
-                          <FormControlLabel
-                            key={optionIndex}
-                            value={optionIndex + 1}
-                            control={<Radio color="primary" />}
-                            label={`${String.fromCharCode(65 + optionIndex)}. ${option}`}
-                            sx={{ mb: 1 }}
-                          />
-                        ))}
-                      </RadioGroup>
-                    </FormControl>
-                    <Accordion>
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography variant="body2">Ayuda</Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <Typography variant="body2" sx={{ textAlign: 'left' }}>
-                          Aquí puede agregar una explicación adicional o ejemplos que ayuden a entender mejor la pregunta.
-                        </Typography>
-                      </AccordionDetails>
-                    </Accordion>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-          <Box mt={4} mb={2} display="flex" justifyContent="space-between">
-            <Button
-              variant="contained"
-              disabled={currentPage === 0}
-              onClick={handlePrevPage}
-              sx={{ backgroundColor: '#1976d2', '&:hover': { backgroundColor: '#115293' } }}
-            >
-              Anterior
-            </Button>
-            {currentPage < totalPages - 1 ? (
+      {showResult ? (
+        <Box sx={{ mt: 4, textAlign: 'center' }}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            Resultado del Estilo de Aprendizaje
+          </Typography>
+          {studentData && (
+            <Box sx={{ textAlign: 'left', mt: 2 }}>
+              <Typography variant="h6">Datos del Alumno:</Typography>
+              <Typography variant="body1">{`Nombre: ${studentData.name}`}</Typography>
+              <Typography variant="body1">{`ID: ${studentData.id}`}</Typography>
+              <Typography variant="body1">{`Email: ${studentData.email}`}</Typography>
+              {/* Agrega otros campos según tus necesidades */}
+            </Box>
+          )}
+          <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+            Tu estilo de aprendizaje según el modelo de Felder-Silverman es:
+          </Typography>
+          <Typography variant="body1">
+            {learningStyle.join(', ')}
+          </Typography>
+          <Button variant="contained" color="primary" onClick={() => setShowResult(false)} sx={{ mt: 2 }}>
+            Volver al Cuestionario
+          </Button>
+        </Box>
+      ) : (
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4, textAlign: 'left' }}>
+          <Typography variant="h4" component="h1" gutterBottom sx={{ textAlign: 'left' }}>
+            Cuestionario de Estilos de Aprendizaje
+          </Typography>
+          <Accordion>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6">Instrucciones para completar el formulario</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Box component="div" sx={{ textAlign: 'left' }}>
+                <Typography>
+                  Este formulario está diseñado para identificar su estilo de aprendizaje según el modelo de Felder-Silverman.
+                </Typography>
+                <ul>
+                  <li>Para cada pregunta, seleccione la opción que mejor describa su preferencia.</li>
+                  <li>Las preguntas están distribuidas en varias páginas, puede avanzar y retroceder usando los botones correspondientes.</li>
+                  <li>Su progreso se mostrará en una barra de progreso en la parte superior del formulario.</li>
+                </ul>
+              </Box>
+            </AccordionDetails>
+          </Accordion>
+          {error && <Alert severity="error">{error}</Alert>}
+          {renderQuestions()}
+          <Grid container spacing={2} justifyContent="space-between">
+            <Grid item>
               <Button
+                type="button"
                 variant="contained"
+                color="primary"
+                onClick={handlePreviousPage}
+                disabled={currentPage === 0}
+              >
+                Anterior
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                type="button"
+                variant="contained"
+                color="primary"
                 onClick={handleNextPage}
-                sx={{ backgroundColor: '#1976d2', '&:hover': { backgroundColor: '#115293' } }}
+                disabled={currentPage === totalPages - 1}
               >
                 Siguiente
               </Button>
-            ) : (
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                sx={{ backgroundColor: '#1976d2', '&:hover': { backgroundColor: '#115293' } }}
-              >
+            </Grid>
+          </Grid>
+          {currentPage === totalPages - 1 && (
+            <Box textAlign="center" mt={2}>
+              <Button type="submit" variant="contained" color="primary">
                 Enviar
               </Button>
-            )}
-          </Box>
-        </form>
-        {error && (
+            </Box>
+          )}
           <Box mt={2}>
-            <Alert severity="error">{error}</Alert>
-          </Box>
-        )}
-        {learningStyle.length > 0 && (
-          <Box mt={4}>
-            <Typography variant="h5" component="h3" gutterBottom>
-              Su Estilo de Aprendizaje
+            <LinearProgress variant="determinate" value={progress} />
+            <Typography variant="body2" color="textSecondary" align="center">
+              {Math.round(progress)}% Completado
             </Typography>
-            <ul>
-              {learningStyle.map((style, index) => (
-                <li key={index}>{style}</li>
-              ))}
-            </ul>
           </Box>
-        )}
-      </Box>
+        </Box>
+      )}
     </Container>
   );
 };
 
 export default LearningStyleFelderSilvermanForm;
+
 
 
 
