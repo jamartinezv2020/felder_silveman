@@ -1,3 +1,5 @@
+// src/components/Sidebar/Sidebar.tsx
+
 import React from 'react';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -7,6 +9,11 @@ import ListItemText from '@mui/material/ListItemText';
 import HomeIcon from '@mui/icons-material/Home';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import SettingsIcon from '@mui/icons-material/Settings';
+import InfoIcon from '@mui/icons-material/Info';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import SearchIcon from '@mui/icons-material/Search';
+import PeopleIcon from '@mui/icons-material/People';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import Divider from '@mui/material/Divider';
 import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
@@ -42,6 +49,26 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, handleDrawerToggle, onPag
           <ListItemIcon><SettingsIcon /></ListItemIcon>
           <ListItemText primary="Settings" />
         </ListItem>
+        <ListItem button onClick={() => handlePageChange('about')}>
+          <ListItemIcon><InfoIcon /></ListItemIcon>
+          <ListItemText primary="About" />
+        </ListItem>
+        <ListItem button onClick={() => handlePageChange('join')}>
+          <ListItemIcon><GroupAddIcon /></ListItemIcon>
+          <ListItemText primary="Join Us" />
+        </ListItem>
+        <ListItem button onClick={() => handlePageChange('search')}>
+          <ListItemIcon><SearchIcon /></ListItemIcon>
+          <ListItemText primary="Search" />
+        </ListItem>
+        <ListItem button onClick={() => handlePageChange('userManagement')}>
+          <ListItemIcon><PeopleIcon /></ListItemIcon>
+          <ListItemText primary="User Management" />
+        </ListItem>
+        <ListItem button onClick={() => handlePageChange('learningStyleFelderSilverman')}>
+          <ListItemIcon><AssignmentIndIcon /></ListItemIcon>
+          <ListItemText primary="Learning Style" />
+        </ListItem>
       </List>
     </div>
   );
@@ -66,7 +93,7 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, handleDrawerToggle, onPag
         variant="permanent"
         sx={{
           display: { xs: 'none', sm: 'block' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, top: '64px' }, // Ajusta el top para alinear con el Header
         }}
         open
       >
@@ -77,6 +104,9 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, handleDrawerToggle, onPag
 };
 
 export default Sidebar;
+
+
+
 
 
 

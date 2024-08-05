@@ -1,21 +1,31 @@
 // src/routes/userRoutes.ts
-import { Router } from 'express';
-import { registerUser, loginUser, getAllUsers, getUserById, updateUser, deleteUser, getUserProfile } from '../controllers/userController';
-import auth from '../middleware/auth';
+import express from 'express';
+import {
+  registerUser,
+  loginUser,
+  getAllUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
+  getUserProfile
+} from '../controllers/userController';
+import { authMiddleware } from '../middleware/authMiddleware';
 
-const router = Router();
+const router = express.Router();
 
-router.post('/register', registerUser); // Ruta para registrar un nuevo usuario
-router.post('/login', loginUser);       // Ruta para iniciar sesión de usuario
+router.post('/register', registerUser);
+router.post('/login', loginUser);
 
-// Rutas de CRUD de usuario
-router.get('/profile', auth, getUserProfile); // Ruta para obtener el perfil del usuario autenticado
-router.get('/', getAllUsers);                // Ruta para obtener todos los usuarios
-router.get('/:id', getUserById);             // Ruta para obtener un usuario por ID
-router.put('/:id', updateUser);              // Ruta para actualizar un usuario por ID
-router.delete('/:id', auth, deleteUser);           // Ruta para eliminar un usuario por ID
+router.get('/', authMiddleware, getAllUsers);
+router.get('/:id', authMiddleware, getUserById);
+router.put('/:id', authMiddleware, updateUser);
+router.delete('/:id', authMiddleware, deleteUser);
+
+router.get('/profile', authMiddleware, getUserProfile);
 
 export default router;
+
+
 
 
 

@@ -1,40 +1,70 @@
+// src/pages/admin/UserManagementPage.tsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import UserList from '../../components/UserList'; // Ajusta la importación según la ubicación de tu componente
-import { User } from '../../models/User'; // Asegúrate de ajustar la ruta según la ubicación correcta de tu interfaz User
+import UserList from '../../components/UserList';
+import { User } from '../../models/User';
 
 const UserManagementPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchUsers(); // Carga los usuarios al montar el componente
+    fetchUsers();
   }, []);
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('/api/users'); // Ajusta la ruta de acuerdo a tu API
-      setUsers(response.data); // Suponiendo que tu API devuelve un array de usuarios
-    } catch (error) {
-      console.error('Error al obtener usuarios:', error);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Token no encontrado');
+      }
+      const response = await axios.get('http://localhost:5000/api/users', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUsers(response.data);
+      setError(null); // Reset error state if request is successful
+    } catch (error: any) {
+      if (error.response && error.response.status === 404) {
+        setError('No se encontraron usuarios.');
+      } else if (error.message === 'Token no encontrado') {
+        setError('Token no encontrado. Por favor, inicia sesión nuevamente.');
+      } else {
+        setError('Error al obtener usuarios: ' + (error.message || error));
+      }
+      console.error('Error al obtener usuarios:', error.message || error);
     }
   };
 
   const handleDeleteUser = async (userId: string) => {
     try {
-      await axios.delete(`/api/users/${userId}`); // Ajusta la ruta de acuerdo a tu API
-      setUsers(users.filter(user => user._id !== userId)); // Actualiza el estado eliminando el usuario
-    } catch (error) {
-      console.error('Error al eliminar usuario:', error);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Token no encontrado');
+      }
+      await axios.delete(`http://localhost:5000/api/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUsers(users.filter(user => user._id !== userId));
+      setError(null); // Reset error state if request is successful
+    } catch (error: any) {
+      if (error.response && error.response.status === 404) {
+        setError('Usuario no encontrado.');
+      } else if (error.message === 'Token no encontrado') {
+        setError('Token no encontrado. Por favor, inicia sesión nuevamente.');
+      } else {
+        setError('Error al eliminar usuario: ' + (error.message || error));
+      }
+      console.error('Error al eliminar usuario:', error.message || error);
     }
   };
 
   return (
     <div>
       <h1>Administración de Usuarios</h1>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       <UserList users={users} onDelete={handleDeleteUser} />
     </div>
   );
 };
 
 export default UserManagementPage;
-

@@ -1,6 +1,8 @@
 import express from 'express';
 import { getQuestionnaire, submitQuestionnaireResponses } from '../controllers/questionnaireController';
-import { authenticateToken } from '../middleware/authMiddleware';
+//import { authenticateToken } from '../middleware/authMiddleware';
+import { authMiddleware, authenticateToken } from '../middleware/authMiddleware';
+
 
 const router = express.Router();
 
