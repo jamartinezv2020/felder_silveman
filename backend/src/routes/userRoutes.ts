@@ -23,6 +23,22 @@ router.delete('/:id', authMiddleware, deleteUser);
 
 router.get('/profile', authMiddleware, getUserProfile);
 
+// En src/routes/userRoutes.js
+router.get('/metrics', async (req, res) => {
+  // Lógica para obtener métricas de usuarios
+});
+
+// En src/routes/studentRoutes.js
+router.get('/metrics', async (req, res) => {
+  // Lógica para obtener métricas de estudiantes
+});
+
+// En src/routes/questionnaire.js
+router.get('/learningStyles', async (req, res) => {
+  // Lógica para obtener datos de estilos de aprendizaje
+});
+
+
 export default router;
 
 

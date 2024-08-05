@@ -13,6 +13,8 @@ import JoinUsPage from '../../pages/JoinUsPage/JoinUsPage';
 import SearchResultsPage from '../../pages/SearchResultsPage/SearchResultsPage';
 import UserManagementPage from '../../pages/UserManagementPage/UserManagementPage';
 import LearningStyleFelderSilvermanForm from '../../components/LearningStyleFelderSilvermanForm';
+import DashboardMetrics from '../../components/DashboardMetrics/DashboardMetrics'; // Importa el nuevo componente
+import TeacMetrics from '../../components/DashboardMetrics/TeacMetrics'; // Importa el nuevo componente
 
 interface DashboardProps {
   children?: React.ReactNode;
@@ -31,7 +33,9 @@ const Dashboard: React.FC<DashboardProps> = ({ children }) => {
       case 'home':
         return <HomePage />;
       case 'analytics':
-        return <AnalyticsPage />;
+        return <DashboardMetrics />; // Usa el nuevo componente aquí
+      case 'teacanalytics':
+        return <TeacMetrics />; // Usa el nuevo componente aquí
       case 'settings':
         return <SettingsPage />;
       case 'about':
@@ -58,8 +62,7 @@ const Dashboard: React.FC<DashboardProps> = ({ children }) => {
       <Header handleDrawerToggle={handleDrawerToggle} />
       <Box sx={{ display: 'flex', flexGrow: 1 }}>
         <Sidebar mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle} onPageChange={setCurrentPage} />
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-          <Toolbar />
+        <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 2 }}>
           {renderPage()}
         </Box>
       </Box>
@@ -69,6 +72,7 @@ const Dashboard: React.FC<DashboardProps> = ({ children }) => {
 };
 
 export default Dashboard;
+
 
 
 

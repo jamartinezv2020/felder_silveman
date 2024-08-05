@@ -45,6 +45,10 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, handleDrawerToggle, onPag
           <ListItemIcon><BarChartIcon /></ListItemIcon>
           <ListItemText primary="Analytics" />
         </ListItem>
+        <ListItem button onClick={() => handlePageChange('teacanalytics')}>
+          <ListItemIcon><BarChartIcon /></ListItemIcon>
+          <ListItemText primary="TeacMetrics" />
+        </ListItem>
         <ListItem button onClick={() => handlePageChange('settings')}>
           <ListItemIcon><SettingsIcon /></ListItemIcon>
           <ListItemText primary="Settings" />
