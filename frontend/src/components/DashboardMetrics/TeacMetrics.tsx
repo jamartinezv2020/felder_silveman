@@ -24,20 +24,22 @@ const TeacMetrics: React.FC = () => {
   const [userStats, setUserStats] = useState<any>(null);
   const [studentStats, setStudentStats] = useState<any>(null);
   const [learningStyleStats, setLearningStyleStats] = useState<any>(null);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Ajusta las URLs según la configuración del servidor Express
-        const userResponse = await axios.get('/api/users/metrics'); // Asegúrate de que esta ruta exista en tu backend
-        const studentResponse = await axios.get('/api/students/metrics'); // Asegúrate de que esta ruta exista en tu backend
-        const learningStyleResponse = await axios.get('/api/questionnaire/learningStyles'); // Asegúrate de que esta ruta exista en tu backend
-        
+        const userResponse = await axios.get('http://localhost:5000/api/users/metrics');
+        const studentResponse = await axios.get('http://localhost:5000/api/students/metrics');
+        const learningStyleResponse = await axios.get('http://localhost:5000/api/questionnaire/learningStyles');
+
         setUserStats(userResponse.data);
         setStudentStats(studentResponse.data);
         setLearningStyleStats(learningStyleResponse.data);
       } catch (error) {
         console.error('Error al obtener datos', error);
+        setError('Error al obtener datos');
       }
     };
 
@@ -117,6 +119,5 @@ const TeacMetrics: React.FC = () => {
     </Box>
   );
 };
-
 
 export default TeacMetrics;

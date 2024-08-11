@@ -23,7 +23,7 @@ const Footer: React.FC = () => {
         &copy; {new Date().getFullYear()} PRICA. All rights reserved.
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-        Made with ❤️ by <Link href="https://prica.com.co" target="_blank" rel="noopener" color="primary">José Alfredo Martínez Valdés</Link>
+        Made with ❤️ by <Link href="https://prica.com.co/web2024" target="_blank" rel="noopener" color="primary">José Alfredo Martínez Valdés</Link>
       </Typography>
       {/* Agregar iconos si es relevante */}
       {/* <Box sx={{ mt: 2 }}>
