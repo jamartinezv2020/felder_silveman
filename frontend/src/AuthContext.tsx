@@ -19,15 +19,20 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(() => {
+    // Recupera el token desde localStorage si existe
+    return localStorage.getItem('token');
+  });
 
   const login = (token: string) => {
     setToken(token);
+    localStorage.setItem('token', token); // Guarda el token en localStorage
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   };
 
   const logout = () => {
     setToken(null);
+    localStorage.removeItem('token'); // Elimina el token de localStorage
     delete axios.defaults.headers.common['Authorization'];
   };
 

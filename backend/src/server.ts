@@ -19,7 +19,7 @@ app.use(cors());
 app.use('/api/questionnaire', questionnaireRoutes);
 app.use('/api/users', userRouter);
 app.use('/api', userRouter);
-app.use('/api/students', student);
+//app.use('/api/students', student);
 app.use('/api/students', studentRoutes);
 
 

@@ -1,7 +1,7 @@
 // src/pages/Dashboard/Dashboard.tsx
 
 import React, { useState, useEffect } from 'react';
-import { Box, Toolbar } from '@mui/material';
+import { Box, Toolbar, CssBaseline, Fade, Slide } from '@mui/material';
 import Header from '../../components/Header/Header';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import Footer from '../../components/Footer/Footer';
@@ -13,8 +13,8 @@ import JoinUsPage from '../../pages/JoinUsPage/JoinUsPage';
 import SearchResultsPage from '../../pages/SearchResultsPage/SearchResultsPage';
 import UserManagementPage from '../../pages/UserManagementPage/UserManagementPage';
 import LearningStyleFelderSilvermanForm from '../../components/LearningStyleFelderSilvermanForm';
-import DashboardMetrics from '../../components/DashboardMetrics/DashboardMetrics'; // Importa el nuevo componente
-import TeacMetrics from '../../components/DashboardMetrics/TeacMetrics'; // Importa el nuevo componente
+import DashboardMetrics from '../../components/DashboardMetrics/DashboardMetrics';
+import TeacMetrics from '../../components/DashboardMetrics/TeacMetrics';
 
 interface DashboardProps {
   children?: React.ReactNode;
@@ -33,9 +33,9 @@ const Dashboard: React.FC<DashboardProps> = ({ children }) => {
       case 'home':
         return <HomePage />;
       case 'analytics':
-        return <DashboardMetrics />; // Usa el nuevo componente aquí
+        return <DashboardMetrics />;
       case 'teacanalytics':
-        return <TeacMetrics />; // Usa el nuevo componente aquí
+        return <TeacMetrics />;
       case 'settings':
         return <SettingsPage />;
       case 'about':
@@ -58,12 +58,18 @@ const Dashboard: React.FC<DashboardProps> = ({ children }) => {
   }, [currentPage]);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
+      <CssBaseline />
       <Header handleDrawerToggle={handleDrawerToggle} />
       <Box sx={{ display: 'flex', flexGrow: 1 }}>
         <Sidebar mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle} onPageChange={setCurrentPage} />
-        <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 2 }}>
-          {renderPage()}
+        <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 2, transition: '0.3s', bgcolor: 'background.paper' }}>
+          {/* Fade or Slide transition for page content */}
+          <Fade in={true} timeout={500}>
+            <div>
+              {renderPage()}
+            </div>
+          </Fade>
         </Box>
       </Box>
       <Footer />
@@ -72,6 +78,7 @@ const Dashboard: React.FC<DashboardProps> = ({ children }) => {
 };
 
 export default Dashboard;
+
 
 
 

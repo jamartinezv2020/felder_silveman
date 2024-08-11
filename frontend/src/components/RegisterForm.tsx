@@ -1,6 +1,10 @@
+// src/pages/RegisterForm.tsx
+
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
-import { TextField, Button, Typography, Box, Snackbar } from '@mui/material';
+import { TextField, Button, Typography, Box } from '@mui/material';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface FormData {
   username: string;
@@ -14,9 +18,6 @@ const RegisterForm: React.FC = () => {
     email: '',
     password: '',
   });
-
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const { username, email, password } = formData;
 
@@ -33,18 +34,12 @@ const RegisterForm: React.FC = () => {
         password,
       });
       console.log(res.data); // Mensaje de confirmación del servidor
-      setSnackbarMessage('Usuario registrado correctamente');
-      setSnackbarOpen(true);
+      toast.success('Usuario registrado correctamente');
       setFormData({ username: '', email: '', password: '' }); // Limpiar el formulario después del registro exitoso
     } catch (err: any) {
       console.error(err.response?.data);
-      setSnackbarMessage('Error al registrar usuario');
-      setSnackbarOpen(true);
+      toast.error('Error al registrar usuario');
     }
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbarOpen(false);
   };
 
   return (
@@ -90,17 +85,23 @@ const RegisterForm: React.FC = () => {
           Registrar
         </Button>
       </form>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        message={snackbarMessage}
+      <ToastContainer
+        position="top-right"
+        autoClose={6000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
       />
     </Box>
   );
 };
 
 export default RegisterForm;
+
 
 
 

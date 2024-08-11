@@ -21,7 +21,7 @@ import Box from '@mui/material/Box';
 interface SidebarProps {
   mobileOpen: boolean;
   handleDrawerToggle: () => void;
-  onPageChange: (page: string) => void; // Función para cambiar la página principal
+  onPageChange: (page: string) => void;
 }
 
 const drawerWidth = 240;
@@ -29,7 +29,7 @@ const drawerWidth = 240;
 const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, handleDrawerToggle, onPageChange }) => {
   const handlePageChange = (page: string) => {
     onPageChange(page);
-    handleDrawerToggle(); // Cerrar la barra lateral después de seleccionar una página (opcional)
+    handleDrawerToggle();
   };
 
   const drawer = (
@@ -37,42 +37,22 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, handleDrawerToggle, onPag
       <Toolbar />
       <Divider />
       <List>
-        <ListItem button onClick={() => handlePageChange('home')}>
-          <ListItemIcon><HomeIcon /></ListItemIcon>
-          <ListItemText primary="Home" />
-        </ListItem>
-        <ListItem button onClick={() => handlePageChange('analytics')}>
-          <ListItemIcon><BarChartIcon /></ListItemIcon>
-          <ListItemText primary="Analytics" />
-        </ListItem>
-        <ListItem button onClick={() => handlePageChange('teacanalytics')}>
-          <ListItemIcon><BarChartIcon /></ListItemIcon>
-          <ListItemText primary="TeacMetrics" />
-        </ListItem>
-        <ListItem button onClick={() => handlePageChange('settings')}>
-          <ListItemIcon><SettingsIcon /></ListItemIcon>
-          <ListItemText primary="Settings" />
-        </ListItem>
-        <ListItem button onClick={() => handlePageChange('about')}>
-          <ListItemIcon><InfoIcon /></ListItemIcon>
-          <ListItemText primary="About" />
-        </ListItem>
-        <ListItem button onClick={() => handlePageChange('join')}>
-          <ListItemIcon><GroupAddIcon /></ListItemIcon>
-          <ListItemText primary="Join Us" />
-        </ListItem>
-        <ListItem button onClick={() => handlePageChange('search')}>
-          <ListItemIcon><SearchIcon /></ListItemIcon>
-          <ListItemText primary="Search" />
-        </ListItem>
-        <ListItem button onClick={() => handlePageChange('userManagement')}>
-          <ListItemIcon><PeopleIcon /></ListItemIcon>
-          <ListItemText primary="User Management" />
-        </ListItem>
-        <ListItem button onClick={() => handlePageChange('learningStyleFelderSilverman')}>
-          <ListItemIcon><AssignmentIndIcon /></ListItemIcon>
-          <ListItemText primary="Learning Style" />
-        </ListItem>
+        {[
+          { text: 'Home', icon: <HomeIcon />, page: 'home' },
+          { text: 'Analytics', icon: <BarChartIcon />, page: 'analytics' },
+          { text: 'TeacMetrics', icon: <BarChartIcon />, page: 'teacanalytics' },
+          { text: 'Settings', icon: <SettingsIcon />, page: 'settings' },
+          { text: 'About', icon: <InfoIcon />, page: 'about' },
+          { text: 'Join Us', icon: <GroupAddIcon />, page: 'join' },
+          { text: 'Search', icon: <SearchIcon />, page: 'search' },
+          { text: 'User Management', icon: <PeopleIcon />, page: 'userManagement' },
+          { text: 'Learning Style', icon: <AssignmentIndIcon />, page: 'learningStyleFelderSilverman' },
+        ].map(({ text, icon, page }) => (
+          <ListItem button onClick={() => handlePageChange(page)} key={text} sx={{ '&:hover': { bgcolor: 'primary.light' } }}>
+            <ListItemIcon>{icon}</ListItemIcon>
+            <ListItemText primary={text} />
+          </ListItem>
+        ))}
       </List>
     </div>
   );
@@ -84,7 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, handleDrawerToggle, onPag
         open={mobileOpen}
         onClose={handleDrawerToggle}
         ModalProps={{
-          keepMounted: true, // Mejora el rendimiento en dispositivos móviles.
+          keepMounted: true,
         }}
         sx={{
           display: { xs: 'block', sm: 'none' },
@@ -97,7 +77,7 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, handleDrawerToggle, onPag
         variant="permanent"
         sx={{
           display: { xs: 'none', sm: 'block' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, top: '64px' }, // Ajusta el top para alinear con el Header
+          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, top: '64px' },
         }}
         open
       >
@@ -108,6 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, handleDrawerToggle, onPag
 };
 
 export default Sidebar;
+
 
 
 

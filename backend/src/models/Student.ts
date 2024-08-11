@@ -4,6 +4,7 @@ import { isFuture, differenceInYears } from 'date-fns';
 // Definición de la interfaz para el estudiante
 export interface IStudent extends Document {
   name: string;
+  category: string;
   email: string;
   birthdate: Date;
   age: number;
@@ -13,8 +14,9 @@ export interface IStudent extends Document {
 }
 
 // Esquema del estudiante
-const studentSchema = new Schema({
+const studentSchema = new Schema<IStudent>({
   name: { type: String, required: true },
+  category: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   birthdate: {
     type: Date,
@@ -44,5 +46,6 @@ studentSchema.pre<IStudent>('save', function (next) {
 });
 
 export default model<IStudent>('Student', studentSchema);
+
 
 

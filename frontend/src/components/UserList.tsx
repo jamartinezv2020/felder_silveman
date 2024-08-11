@@ -1,33 +1,39 @@
+// src/components/UserList.tsx
+
 import React from 'react';
-import { User } from '../models/User'; // Ajusta la ruta según la ubicación de tu interfaz User
-import { Box, Typography, Button, Divider } from '@mui/material';
+import { User } from '../models/User';
+import {
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+} from '@mui/material';
 
 interface UserListProps {
   users: User[];
-  onDelete: (userId: string) => void;
+  onDelete: (id: string) => void;
+  onEdit: (user: User) => void;
+  onView: (user: User) => void;
+  renderIcons?: (user: User) => React.ReactNode;
 }
 
-const UserList: React.FC<UserListProps> = ({ users, onDelete }) => {
+const UserList: React.FC<UserListProps> = ({
+  users,
+  renderIcons,
+}) => {
   return (
-    <Box mt={4}>
-      <Typography variant="h4" gutterBottom>
-        Lista de Usuarios Registrados
-      </Typography>
+    <List>
       {users.map((user) => (
-        <Box key={user._id} mb={2} p={2} bgcolor="background.paper" boxShadow={2}>
-          <Typography variant="h5">{user.username}</Typography>
-          <Typography variant="body1" color="text.secondary">
-            Email: {user.email}
-          </Typography>
-          {/* Aquí puedes mostrar más detalles del usuario según tus necesidades */}
-          <Button variant="contained" color="error" onClick={() => onDelete(user._id)}>
-            Eliminar
-          </Button>
-          <Divider sx={{ mt: 2 }} />
-        </Box>
+        <ListItem key={user._id} divider>
+          <ListItemText primary={user.username} secondary={user.email} />
+          {renderIcons && renderIcons(user)}
+        </ListItem>
       ))}
-    </Box>
+    </List>
   );
 };
 
 export default UserList;
+
+
+
