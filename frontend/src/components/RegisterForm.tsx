@@ -1,10 +1,11 @@
-// src/pages/RegisterForm.tsx
+// Ubicación: src/pages/RegisterForm.tsx
 
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
 import { TextField, Button, Typography, Box } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
 interface FormData {
   username: string;
@@ -19,6 +20,7 @@ const RegisterForm: React.FC = () => {
     password: '',
   });
 
+  const navigate = useNavigate(); // Hook para navegación
   const { username, email, password } = formData;
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -36,6 +38,9 @@ const RegisterForm: React.FC = () => {
       console.log(res.data); // Mensaje de confirmación del servidor
       toast.success('Usuario registrado correctamente');
       setFormData({ username: '', email: '', password: '' }); // Limpiar el formulario después del registro exitoso
+      
+      // Redirigir al usuario a la página de login después de un registro exitoso
+      navigate('/login');
     } catch (err: any) {
       console.error(err.response?.data);
       toast.error('Error al registrar usuario');
@@ -81,10 +86,19 @@ const RegisterForm: React.FC = () => {
           margin="normal"
           required
         />
-        <Button type="submit" variant="contained" color="primary">
+        <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
           Registrar
         </Button>
       </form>
+      <Button
+        variant="outlined"
+        color="secondary"
+        onClick={() => navigate('/login')}
+        sx={{ mt: 2 }}
+        fullWidth
+      >
+        Volver al Login
+      </Button>
       <ToastContainer
         position="top-right"
         autoClose={6000}
@@ -101,7 +115,5 @@ const RegisterForm: React.FC = () => {
 };
 
 export default RegisterForm;
-
-
 
 

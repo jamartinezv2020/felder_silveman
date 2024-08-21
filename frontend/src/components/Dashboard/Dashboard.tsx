@@ -1,8 +1,9 @@
 // src/pages/Dashboard/Dashboard.tsx
+// src/pages/Dashboard/Dashboard.tsx
 
 import React, { useState, useEffect } from 'react';
-import { Box, Toolbar, CssBaseline, Fade, Slide } from '@mui/material';
-import Header from '../../components/Header/Header';
+import { Box, CssBaseline, Fade } from '@mui/material';
+import Navbar from '../../components/NavBar/NavBar'; // Importar el Navbar
 import Sidebar from '../../components/Sidebar/Sidebar';
 import Footer from '../../components/Footer/Footer';
 import HomePage from '../../pages/HomePage';
@@ -15,6 +16,7 @@ import UserManagementPage from '../../pages/UserManagementPage/UserManagementPag
 import LearningStyleFelderSilvermanForm from '../../components/LearningStyleFelderSilvermanForm';
 import DashboardMetrics from '../../components/DashboardMetrics/DashboardMetrics';
 import TeacMetrics from '../../components/DashboardMetrics/TeacMetrics';
+import './Dashboard.css'; // Asegúrate de tener este archivo CSS para el diseño del Dashboard
 
 interface DashboardProps {
   children?: React.ReactNode;
@@ -60,11 +62,11 @@ const Dashboard: React.FC<DashboardProps> = ({ children }) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
       <CssBaseline />
-      <Header handleDrawerToggle={handleDrawerToggle} />
+      <Navbar handleDrawerToggle={handleDrawerToggle} /> {/* Reemplaza el Header con el Navbar */}
       <Box sx={{ display: 'flex', flexGrow: 1 }}>
         <Sidebar mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle} onPageChange={setCurrentPage} />
-        <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 2, transition: '0.3s', bgcolor: 'background.paper' }}>
-          {/* Fade or Slide transition for page content */}
+        <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 2, transition: 'transform 0.3s ease-in-out', bgcolor: 'background.paper' }}>
+          {/* Fade transition for page content */}
           <Fade in={true} timeout={500}>
             <div>
               {renderPage()}
@@ -78,6 +80,10 @@ const Dashboard: React.FC<DashboardProps> = ({ children }) => {
 };
 
 export default Dashboard;
+
+
+
+
 
 
 

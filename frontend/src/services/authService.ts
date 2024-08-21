@@ -1,3 +1,16 @@
+// src/services/authService.ts
+
+interface UserCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterData {
+  email: string;
+  password: string;
+  username?: string;
+}
+// Función para iniciar sesión
 export const login = async (email: string, password: string): Promise<boolean> => {
   try {
     const response = await fetch('/api/auth/login', {
@@ -14,7 +27,7 @@ export const login = async (email: string, password: string): Promise<boolean> =
   }
 };
 
-export const register = async (email: string, password: string, extraData: object = {}): Promise<boolean> => {
+export const register = async (email: string, password: string, extraData: Partial<RegisterData> = {}): Promise<boolean> => {
   try {
     const response = await fetch('/api/auth/register', {
       method: 'POST',
@@ -30,6 +43,7 @@ export const register = async (email: string, password: string, extraData: objec
   }
 };
 
+// Función para recuperar la contraseña
 export const recoverPassword = async (email: string): Promise<boolean> => {
   try {
     const response = await fetch('/api/auth/recover', {
@@ -46,6 +60,7 @@ export const recoverPassword = async (email: string): Promise<boolean> => {
   }
 };
 
+// Función para cerrar sesión
 export const logout = async (): Promise<void> => {
   try {
     await fetch('/api/auth/logout', {
@@ -58,4 +73,25 @@ export const logout = async (): Promise<void> => {
     console.error('Error logging out:', error);
   }
 };
+
+// Función para obtener el email del usuario autenticado (requiere autenticación)
+export const getUserEmail = async (): Promise<string> => {
+  try {
+    const response = await fetch('/api/auth/user', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    if (response.ok) {
+      const data = await response.json();
+      return data.email;
+    }
+    throw new Error('Failed to fetch user email');
+  } catch (error) {
+    console.error('Error fetching user email:', error);
+    throw error;
+  }
+};
+
 

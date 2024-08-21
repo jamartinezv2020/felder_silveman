@@ -1,22 +1,15 @@
 // src/components/Sidebar/Sidebar.tsx
 
 import React from 'react';
-import Drawer from '@mui/material/Drawer';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import { Drawer, Box, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
-import BarChartIcon from '@mui/icons-material/BarChart';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
 import SettingsIcon from '@mui/icons-material/Settings';
 import InfoIcon from '@mui/icons-material/Info';
-import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import GroupIcon from '@mui/icons-material/Group';
 import SearchIcon from '@mui/icons-material/Search';
-import PeopleIcon from '@mui/icons-material/People';
-import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
-import Divider from '@mui/material/Divider';
-import Toolbar from '@mui/material/Toolbar';
-import Box from '@mui/material/Box';
+import UserIcon from '@mui/icons-material/Person';
+import LearningIcon from '@mui/icons-material/School';
 
 interface SidebarProps {
   mobileOpen: boolean;
@@ -24,51 +17,84 @@ interface SidebarProps {
   onPageChange: (page: string) => void;
 }
 
-const drawerWidth = 240;
-
 const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, handleDrawerToggle, onPageChange }) => {
-  const handlePageChange = (page: string) => {
-    onPageChange(page);
-    handleDrawerToggle();
-  };
+  const drawerWidth = 240;
 
   const drawer = (
-    <div>
-      <Toolbar />
-      <Divider />
+    <Box sx={{ width: drawerWidth }}>
       <List>
-        {[
-          { text: 'Home', icon: <HomeIcon />, page: 'home' },
-          { text: 'Analytics', icon: <BarChartIcon />, page: 'analytics' },
-          { text: 'TeacMetrics', icon: <BarChartIcon />, page: 'teacanalytics' },
-          { text: 'Settings', icon: <SettingsIcon />, page: 'settings' },
-          { text: 'About', icon: <InfoIcon />, page: 'about' },
-          { text: 'Join Us', icon: <GroupAddIcon />, page: 'join' },
-          { text: 'Search', icon: <SearchIcon />, page: 'search' },
-          { text: 'User Management', icon: <PeopleIcon />, page: 'userManagement' },
-          { text: 'Learning Style', icon: <AssignmentIndIcon />, page: 'learningStyleFelderSilverman' },
-        ].map(({ text, icon, page }) => (
-          <ListItem button onClick={() => handlePageChange(page)} key={text} sx={{ '&:hover': { bgcolor: 'primary.light' } }}>
-            <ListItemIcon>{icon}</ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
+        <ListItem button onClick={() => onPageChange('home')}>
+          <ListItemIcon>
+            <HomeIcon sx={{ color: 'primary.main' }} />
+          </ListItemIcon>
+          <ListItemText primary="Home" />
+        </ListItem>
+        <ListItem button onClick={() => onPageChange('analytics')}>
+          <ListItemIcon>
+            <AnalyticsIcon sx={{ color: 'secondary.main' }} />
+          </ListItemIcon>
+          <ListItemText primary="Analytics" />
+        </ListItem>
+        <ListItem button onClick={() => onPageChange('teacanalytics')}>
+          <ListItemIcon>
+            <AnalyticsIcon sx={{ color: 'info.main' }} />
+          </ListItemIcon>
+          <ListItemText primary="Teac Analytics" />
+        </ListItem>
+        <ListItem button onClick={() => onPageChange('settings')}>
+          <ListItemIcon>
+            <SettingsIcon sx={{ color: 'success.main' }} />
+          </ListItemIcon>
+          <ListItemText primary="Settings" />
+        </ListItem>
+        <ListItem button onClick={() => onPageChange('about')}>
+          <ListItemIcon>
+            <InfoIcon sx={{ color: 'warning.main' }} />
+          </ListItemIcon>
+          <ListItemText primary="About" />
+        </ListItem>
+        <ListItem button onClick={() => onPageChange('join')}>
+          <ListItemIcon>
+            <GroupIcon sx={{ color: 'error.main' }} />
+          </ListItemIcon>
+          <ListItemText primary="Join Us" />
+        </ListItem>
+        <ListItem button onClick={() => onPageChange('search')}>
+          <ListItemIcon>
+            <SearchIcon sx={{ color: 'text.primary' }} />
+          </ListItemIcon>
+          <ListItemText primary="Search" />
+        </ListItem>
+        <ListItem button onClick={() => onPageChange('userManagement')}>
+          <ListItemIcon>
+            <UserIcon sx={{ color: 'text.secondary' }} />
+          </ListItemIcon>
+          <ListItemText primary="User Management" />
+        </ListItem>
+        <ListItem button onClick={() => onPageChange('learningStyleFelderSilverman')}>
+          <ListItemIcon>
+            <LearningIcon sx={{ color: 'text.primary' }} />
+          </ListItemIcon>
+          <ListItemText primary="Learning Styles" />
+        </ListItem>
       </List>
-    </div>
+    </Box>
   );
 
   return (
-    <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}>
+    <nav>
       <Drawer
         variant="temporary"
         open={mobileOpen}
         onClose={handleDrawerToggle}
         ModalProps={{
-          keepMounted: true,
+          keepMounted: true, // Mejor rendimiento en dispositivos móviles.
         }}
         sx={{
           display: { xs: 'block', sm: 'none' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+          },
         }}
       >
         {drawer}
@@ -77,17 +103,23 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, handleDrawerToggle, onPag
         variant="permanent"
         sx={{
           display: { xs: 'none', sm: 'block' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, top: '64px' },
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+          },
         }}
         open
       >
         {drawer}
       </Drawer>
-    </Box>
+    </nav>
   );
 };
 
 export default Sidebar;
+
+
+
 
 
 

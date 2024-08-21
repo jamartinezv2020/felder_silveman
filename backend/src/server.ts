@@ -14,14 +14,18 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(cors());
-
+app.use(express.json());
 // Usar las rutas
 app.use('/api/questionnaire', questionnaireRoutes);
 app.use('/api/users', userRouter);
+
 app.use('/api', userRouter);
 //app.use('/api/students', student);
 app.use('/api/students', studentRoutes);
-
+app.get('/api/auth/user/email', (req, res) => {
+  // Lógica para obtener el email del usuario
+  res.json({ email: 'usuario@example.com' });
+});
 
 
 mongoose.connect('mongodb://localhost:27017/bd_feldersilverman', {

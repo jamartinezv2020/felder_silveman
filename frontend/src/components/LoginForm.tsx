@@ -6,6 +6,8 @@ import { TextField, Button, Container, Typography, Box, Link } from '@mui/materi
 import { Google as GoogleIcon } from '@mui/icons-material';
 import { useAuth } from '../AuthContext';
 import RegisterForm from './RegisterForm';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -30,19 +32,54 @@ const LoginForm: React.FC = () => {
 
         if (res.ok) {
           login(data.token);
+          toast.success('Login successful!');
           navigate('/dashboard');
         } else {
-          alert('Login failed: ' + data.message);
+          toast.error('Login failed: ' + data.message);
         }
       } catch (error: any) {
-        alert('Login failed: ' + error.message);
+        toast.error('Login failed: ' + error.message);
       }
     } else if (mode === 'register') {
-      alert('Registration successful. Please log in.');
-      setMode('login');
+      try {
+        const res = await fetch('http://localhost:5000/api/users/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          toast.success('Registration successful! Redirecting to login page...');
+          setMode('login');
+          navigate('/login');  // Redirigir después de cambiar el modo
+        } else {
+          toast.error('Registration failed: ' + data.message);
+        }
+      } catch (error: any) {
+        toast.error('Registration failed: ' + error.message);
+      }
     } else if (mode === 'recover') {
-      alert('Password recovery email sent');
-      setMode('login');
+      try {
+        const res = await fetch('http://localhost:5000/api/users/recover', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        if (res.ok) {
+          toast.success('Password recovery email sent');
+          setMode('login');
+        } else {
+          toast.error('Failed to send recovery email');
+        }
+      } catch (error: any) {
+        toast.error('Failed to send recovery email: ' + error.message);
+      }
     }
   };
 
@@ -132,6 +169,4 @@ const LoginForm: React.FC = () => {
 };
 
 export default LoginForm;
-
-
 
